@@ -1,0 +1,6 @@
+{
+  "name": "TypeSpeed - Typing Speed Test",
+  "description": "A modern typing speed test web application with live WPM and accuracy tracking, responsive UI, and a global top 10 leaderboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

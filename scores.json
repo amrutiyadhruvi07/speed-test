@@ -1,0 +1,37 @@
+[
+  {
+    "id": "init-1",
+    "name": "Alex C.",
+    "wpm": 98,
+    "accuracy": 99,
+    "date": "2026-09-24T14:32:00.000Z"
+  },
+  {
+    "id": "init-2",
+    "name": "Sarah M.",
+    "wpm": 89,
+    "accuracy": 97,
+    "date": "2026-09-25T09:15:00.000Z"
+  },
+  {
+    "id": "init-3",
+    "name": "David K.",
+    "wpm": 82,
+    "accuracy": 96,
+    "date": "2026-09-25T18:42:00.000Z"
+  },
+  {
+    "id": "init-4",
+    "name": "Elena R.",
+    "wpm": 76,
+    "accuracy": 98,
+    "date": "2026-09-26T08:10:00.000Z"
+  },
+  {
+    "id": "init-5",
+    "name": "Liam P.",
+    "wpm": 71,
+    "accuracy": 94,
+    "date": "2026-09-26T11:20:00.000Z"
+  }
+]

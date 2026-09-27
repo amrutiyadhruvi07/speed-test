@@ -1,18 +1,274 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TypeSpeed - Typing Speed Test</title>
-    <meta name="description" content="A modern typing speed test web application with live WPM and accuracy tracking, responsive UI, and a global top 10 leaderboard." />
-    <meta property="og:title" content="TypeSpeed - Typing Speed Test" />
-    <meta property="og:description" content="A modern typing speed test web application with live WPM and accuracy tracking, responsive UI, and a global top 10 leaderboard." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TypeSpeed - Typing Speed Test & Global Leaderboard</title>
+  <meta name="description" content="Test your typing speed and accuracy in real-time and compete on the global Top 10 leaderboard." />
+  <meta property="og:title" content="TypeSpeed - Typing Speed Test & Global Leaderboard" />
+  <meta property="og:description" content="Test your typing speed and accuracy in real-time and compete on the global Top 10 leaderboard." />
+  
+  <!-- Modern Google Fonts: Inter for UI and JetBrains Mono for typing -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M7 16h10"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>TypeSpeed</h1>
+          <span class="brand-tagline">Real-time typing velocity & leaderboard</span>
+        </div>
+      </div>
+      <div class="header-shortcuts">
+        <span class="badge shortcut-badge"><kbd>Tab</kbd> or <kbd>Esc</kbd> to restart</span>
+      </div>
+    </header>
 
+    <!-- Main Container: Typing Arena + Leaderboard Sidebar -->
+    <main class="main-container">
+      <!-- Typing Test Arena -->
+      <section class="typing-arena" aria-label="Typing Speed Test Area">
+        <div class="test-card">
+          <!-- Live Stats Bar -->
+          <div class="stats-bar">
+            <!-- Timer -->
+            <div class="stat-item" id="stat-timer-container">
+              <span class="stat-label">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Time
+              </span>
+              <span class="stat-value" id="stat-timer">00:00</span>
+            </div>
+
+            <!-- Live WPM -->
+            <div class="stat-item" id="stat-wpm-container">
+              <span class="stat-label">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+                WPM
+              </span>
+              <span class="stat-value highlight-accent" id="stat-wpm">0</span>
+            </div>
+
+            <!-- Live Accuracy -->
+            <div class="stat-item" id="stat-accuracy-container">
+              <span class="stat-label">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <circle cx="12" cy="12" r="6"/>
+                  <circle cx="12" cy="12" r="2"/>
+                </svg>
+                Accuracy
+              </span>
+              <span class="stat-value" id="stat-accuracy">100%</span>
+            </div>
+
+            <!-- Progress tracker -->
+            <div class="stat-item stat-progress-item">
+              <span class="stat-label">Progress</span>
+              <span class="stat-value stat-small" id="stat-progress">0%</span>
+            </div>
+          </div>
+
+          <!-- Typing Display Box -->
+          <div class="typing-box-wrapper" id="typing-box-wrapper" tabindex="0">
+            <!-- Focus state indicator banner -->
+            <div class="focus-notice" id="focus-notice">
+              <span>Click here or press any key to focus</span>
+            </div>
+
+            <!-- Character text container -->
+            <div class="text-display" id="text-display" aria-live="polite">
+              <!-- Span elements will be dynamically injected here -->
+            </div>
+
+            <!-- Hidden input for capturing keystrokes seamlessly -->
+            <input 
+              type="text" 
+              id="hidden-input" 
+              class="hidden-input" 
+              autocomplete="off" 
+              autocorrect="off" 
+              autocapitalize="off" 
+              spellcheck="false" 
+              aria-label="Type the text here"
+            />
+          </div>
+
+          <!-- Control Buttons Bar -->
+          <div class="controls-bar">
+            <button id="btn-restart" class="btn btn-secondary" title="Restart current test (Tab or Esc)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+              <span>Restart</span>
+            </button>
+
+            <button id="btn-new-text" class="btn btn-secondary" title="Load a new random text">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              <span>New Text</span>
+            </button>
+
+            <!-- Sound toggle button -->
+            <button id="btn-sound-toggle" class="btn btn-icon" title="Toggle audio feedback" aria-label="Toggle typing sound">
+              <svg id="icon-sound-on" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              </svg>
+              <svg id="icon-sound-off" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <line x1="23" y1="9" x2="17" y2="15"/>
+                <line x1="17" y1="9" x2="23" y2="15"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Global Leaderboard Section -->
+      <aside class="leaderboard-section" aria-label="Global Leaderboard">
+        <div class="leaderboard-card">
+          <div class="leaderboard-header">
+            <div class="leaderboard-title">
+              <svg class="trophy-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                <path d="M4 22h16"/>
+                <path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"/>
+                <path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/>
+              </svg>
+              <h2>Leaderboard</h2>
+              <span class="leaderboard-subtitle">Top 10</span>
+            </div>
+            <button id="btn-refresh-leaderboard" class="btn btn-icon" title="Refresh leaderboard" aria-label="Refresh leaderboard">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Leaderboard Table Container -->
+          <div class="leaderboard-table-wrapper">
+            <table class="leaderboard-table" id="leaderboard-table">
+              <thead>
+                <tr>
+                  <th scope="col" class="th-rank">#</th>
+                  <th scope="col" class="th-name">Player</th>
+                  <th scope="col" class="th-wpm">WPM</th>
+                  <th scope="col" class="th-acc">Acc</th>
+                  <th scope="col" class="th-date">Date</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboard-tbody">
+                <!-- Dynamically populated rows -->
+                <tr>
+                  <td colspan="5" class="table-loading">Loading top speeds...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Results Modal Overlay -->
+    <div class="modal-overlay hidden" id="results-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-badge-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="8" r="7"/>
+              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+            </svg>
+          </div>
+          <h2 id="modal-title">Typing Test Completed!</h2>
+          <p class="modal-subtitle">Great run! Here is how you performed:</p>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="results-grid">
+          <div class="result-tile">
+            <span class="result-label">Speed</span>
+            <span class="result-value accent" id="modal-final-wpm">0</span>
+            <span class="result-unit">WPM</span>
+          </div>
+
+          <div class="result-tile">
+            <span class="result-label">Accuracy</span>
+            <span class="result-value" id="modal-final-accuracy">0%</span>
+            <span class="result-unit">Correct</span>
+          </div>
+
+          <div class="result-tile">
+            <span class="result-label">Time</span>
+            <span class="result-value" id="modal-final-time">0s</span>
+            <span class="result-unit">Elapsed</span>
+          </div>
+
+          <div class="result-tile">
+            <span class="result-label">Characters</span>
+            <span class="result-value" id="modal-final-chars">0</span>
+            <span class="result-unit">Total</span>
+          </div>
+        </div>
+
+        <!-- Submit to Leaderboard Form -->
+        <form class="submit-score-form" id="submit-score-form">
+          <label for="player-name-input" class="form-label">Submit to Global Leaderboard</label>
+          <div class="form-input-group">
+            <input 
+              type="text" 
+              id="player-name-input" 
+              class="form-input" 
+              placeholder="Enter your name (max 20 chars)" 
+              maxlength="20"
+              autocomplete="name"
+              required 
+            />
+            <button type="submit" id="btn-submit-score" class="btn btn-primary">
+              <span id="btn-submit-text">Submit Score</span>
+              <span id="btn-submit-spinner" class="spinner hidden"></span>
+            </button>
+          </div>
+          <div class="form-message" id="submit-message" role="alert"></div>
+        </form>
+
+        <!-- Modal Actions -->
+        <div class="modal-actions">
+          <button id="btn-modal-retry" class="btn btn-secondary btn-full">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span>Try Again</span>
+          </button>
+          <button id="btn-modal-close" class="btn btn-ghost" title="Close dialog">
+            <span>Dismiss</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vanilla JavaScript Logic -->
+  <script src="script.js"></script>
+</body>
+</html>
